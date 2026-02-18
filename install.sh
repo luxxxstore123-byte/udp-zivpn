@@ -1206,10 +1206,13 @@ send_telegram_message() {
 log "Starting license check..."
 
 # 1. Get Server IP
-SERVER_IP=$(curl -4 -s https://api.ipify.org)
-if [ -z "$SERVER_IP" ]; then
-    log "Error: Failed to retrieve server IP. Exiting."
-    exit 1
+# 1. Get Server IP (Stable Version)
+SERVER_IP=$(curl -4 -s --max-time 5 https://api.ipify.org)
+
+# Validasi IP supaya tidak revoke palsu
+if [[ ! "$SERVER_IP" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    log "Invalid IP detected. Skipping license check."
+    exit 0
 fi
 
 # 2. Get Local License Info
